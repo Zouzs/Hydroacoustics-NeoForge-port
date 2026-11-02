@@ -1,0 +1,83 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '1.0.23'
+    id 'maven-publish'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    gradleVersion = '8.10.2'
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = property('mod_version')
+group = property('mod_group_id')
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name = "Max Henkel Maven"
+        url = "https://maven.maxhenkel.de/repository/public"
+    }
+    maven {
+        name = "NeoForged"
+        url = "https://maven.neoforged.net/releases"
+    }
+}
+
+neoForge {
+    // Specify NeoForge version
+    version = property('neo_version')
+
+    // Configure test run targets
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', property('mod_id')
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', property('mod_id')
+        }
+    }
+
+    mods {
+        "\${property('mod_id')}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+dependencies {
+    // Simple Voice Chat API for NeoForge 1.21.1
+    compileOnly 'de.maxhenkel.voicechat:voicechat-api:2.5.0'
+}
+
+// Java 21 compilation parameters
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+// Process resources and expand token values
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand 'version': project.version
+    }
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+}
