@@ -1,4 +1,4 @@
-# Notes: This is an unnoficial port of Voice Chat Hydroacoustics by FrankLoq for NeoForge 1.21.1
+# Notes: This is an unofficial port of Voice Chat Hydroacoustics by FrankLoq for NeoForge 1.21.1
 
 
 
